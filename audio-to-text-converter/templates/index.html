@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audio to Text Converter</title>
+</head>
+<body>
+  <div style="text-align:center;margin-top:50px;">
+    <h2>🎤 Audio to Text Converter</h2>
+    <form id="uploadForm">
+      <input type="file" id="audioFile" name="audio" accept="audio/*" required>
+      <button type="submit">Convert to Text</button>
+    </form>
+
+    <div id="result" style="margin-top:20px;">
+      <h3>Transcribed Text:</h3>
+      <p id="transcription"></p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("audioFile");
+      if (!fileInput.files.length) {
+        alert("Please select an audio file!");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("audio", fileInput.files[0]);
+
+      try {
+        const response = await fetch("/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.text) {
+          document.getElementById("transcription").textContent = data.text;
+        } else {
+          document.getElementById("transcription").textContent =
+            "Error: " + (data.error || "Unknown error");
+        }
+      } catch (error) {
+        document.getElementById("transcription").textContent =
+          "Error: " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>
